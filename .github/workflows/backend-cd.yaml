@@ -153,7 +153,7 @@ jobs:
 
       - name: Update backend image
         run: |
-          kustomize edit set image backend=${{ needs.build.outputs.image }}
+          kustomize edit set image backend=${{ secrets.ECR_BACKEND_REPO }}:${{ github.sha }}
 
       - name: Deploy backend
         run: |
