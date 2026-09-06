@@ -102,7 +102,7 @@ jobs:
       - name: Build Docker image
         run: |
           docker build \
-            --build-arg REACT_APP_MOVIE_API_URL=http://localhost:5000 \
+            --build-arg REACT_APP_MOVIE_API_URL=http://a48f48cd209aa476abf9bcc23a0202ed-742665971.us-east-1.elb.amazonaws.com \
             -t ${{ steps.image.outputs.image }} .
 
       - name: Push Docker image
