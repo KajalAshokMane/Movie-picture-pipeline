@@ -1,5 +1,19 @@
+name: Frontend Continuous Integration
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'starter/frontend/**'
+      - '.github/workflows/frontend-ci.yaml'
+
+  workflow_dispatch:
+
 jobs:
+
   lint:
+    name: Lint
     runs-on: ubuntu-latest
 
     defaults:
@@ -7,9 +21,11 @@ jobs:
         working-directory: starter/frontend
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: npm
@@ -21,7 +37,9 @@ jobs:
       - name: Run lint
         run: npm run lint
 
+
   test:
+    name: Test
     runs-on: ubuntu-latest
 
     defaults:
@@ -29,9 +47,11 @@ jobs:
         working-directory: starter/frontend
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: npm
@@ -43,19 +63,26 @@ jobs:
       - name: Run tests
         run: npm test
 
+
   build:
+    name: Build
     runs-on: ubuntu-latest
 
-    needs: [lint, test]   # ⭐ Lint + Test must finish first
+    # Build starts ONLY after lint and test successfully finish
+    needs:
+      - lint
+      - test
 
     defaults:
       run:
         working-directory: starter/frontend
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: npm
