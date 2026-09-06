@@ -27,11 +27,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version-file: starter/frontend/.nvmrc
-          cache: npm
+          node-version: '18'
+          cache: 'npm'
           cache-dependency-path: starter/frontend/package-lock.json
 
       - name: Install dependencies
@@ -39,7 +39,6 @@ jobs:
 
       - name: Run lint
         run: npm run lint
-
 
   test:
     runs-on: ubuntu-latest
@@ -52,19 +51,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version-file: starter/frontend/.nvmrc
-          cache: npm
+          node-version: '18'
+          cache: 'npm'
           cache-dependency-path: starter/frontend/package-lock.json
 
       - name: Install dependencies
         run: npm ci
 
       - name: Run tests
-        run: CI=true npm test
-
+        run: CI=true npm test -- --watchAll=false
 
   build:
     runs-on: ubuntu-latest
@@ -72,9 +70,6 @@ jobs:
     needs:
       - lint
       - test
-
-    outputs:
-      image: ${{ steps.image.outputs.image }}
 
     defaults:
       run:
@@ -106,8 +101,8 @@ jobs:
             -t ${{ steps.image.outputs.image }} .
 
       - name: Push Docker image
-        run: docker push ${{ steps.image.outputs.image }}
-
+        run: |
+          docker push ${{ steps.image.outputs.image }}
 
   deploy:
     runs-on: ubuntu-latest
@@ -137,16 +132,16 @@ jobs:
 
       - name: Install Kustomize
         run: |
-          curl -L \
-            https://github.com/kubernetes-sigs/kustomize/releases/latest/download/kustomize_linux_amd64.tar.gz \
-            -o kustomize.tar.gz
+          curl -sSLo kustomize.tar.gz \
+            https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv5.7.1/kustomize_v5.7.1_linux_amd64.tar.gz
           tar -xzf kustomize.tar.gz
           chmod +x kustomize
           sudo mv kustomize /usr/local/bin/kustomize
+          kustomize version
 
       - name: Update frontend image
         run: |
-          kustomize edit set image frontend=${{ needs.build.outputs.image }}
+          kustomize edit set image frontend=${{ secrets.ECR_FRONTEND_REPO }}:${{ github.sha }}
 
       - name: Deploy frontend
         run: |
