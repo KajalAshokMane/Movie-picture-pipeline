@@ -1,4 +1,4 @@
-name: Backend Continuous Integration
+﻿name: Backend Continuous Integration
 
 on:
   pull_request:
@@ -15,7 +15,6 @@ jobs:
     defaults:
       run:
         working-directory: starter/backend
-
     steps:
       - uses: actions/checkout@v4
 
@@ -36,7 +35,6 @@ jobs:
     defaults:
       run:
         working-directory: starter/backend
-
     steps:
       - uses: actions/checkout@v4
 
@@ -57,14 +55,11 @@ jobs:
     needs:
       - lint
       - test
-
     defaults:
       run:
         working-directory: starter/backend
-
     steps:
       - uses: actions/checkout@v4
 
       - name: Build Docker Image
         run: docker build -t mp-backend:latest .
-
